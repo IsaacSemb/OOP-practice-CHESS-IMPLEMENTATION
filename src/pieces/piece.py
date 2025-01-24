@@ -103,6 +103,7 @@ class Piece(ABC):
         """
         pass
     
+    @abstractmethod
     def get_possible_moves(self,board) -> list[Position]:
         """
         Calculate all possible moves for this piece
