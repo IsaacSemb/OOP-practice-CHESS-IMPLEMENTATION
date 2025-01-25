@@ -2,6 +2,14 @@ from abc import ABC, abstractmethod
 from typing import Dict, List, Type
 from src.board.board import Board
 from src.pieces.piece import Position, Piece, Color
+from src.pieces.concrete_pieces import (
+    Rook,
+    Knight,
+    Bishop,
+    Queen,
+    King,
+    Pawn 
+    )
 
 class MovementStrategy(ABC):
     
