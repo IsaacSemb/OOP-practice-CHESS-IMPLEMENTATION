@@ -101,27 +101,130 @@ class KnightMovementStrategy(MovementStrategy):
 
 
 class BishopMovementStrategy(MovementStrategy):
-    def calculate_possible_moves(self, piece, board):
-        pass
-    pass
+    def calculate_possible_moves(self, piece:Piece, board:Board):
+        
+        possible_moves = []
+        current_pos = piece.current_position
+        
+        # setting out diagonal moves for ther bishop
+        directions = [
+            (1, 1),
+            (1, -1),
+            (-1, 1),
+            (-1, -1)
+        ]
+        
+        for dx, dy in directions:
+            for step in range(1,8):
+                new_file = chr(ord(current_pos.file) + dx*step)
+                new_rank = current_pos.rank +dy*step
+                
+                try:
+                    new_pos = Position(new_rank, new_file)
+                except ValueError:
+                    break
+                
+                # incase of blocking piece
+                blocking_piece = board.get_piece_at(new_pos)
+                
+                # incase there is a blocking piece
+                if blocking_piece:
+                    if blocking_piece.color != piece.color:
+                        possible_moves.append(new_pos)
+                
+                possible_moves.append(new_pos)
+        
+        return possible_moves
+
 
 
 class QueenMovementStrategy(MovementStrategy):
-    def calculate_possible_moves(self, piece, board):
-        pass
-    pass
+    def __init__(self):
+        self.rook_strategy = RookMovementStrategy()
+        self.bishop_strategy = BishopMovementStrategy()
+
+    def calculate_possible_moves(self, piece:Piece, board:Board)->List[Position]:
+        rook_moves = self.rook_strategy.calculate_possible_moves(piece,board)
+        bishop_moves = self.bishop_strategy.calculate_possible_moves(piece,board)
+        return rook_moves + bishop_moves
+
+class PawnMovementStrategy(MovementStrategy):
+    def calculate_possible_moves(self, piece:Piece, board:Board):
+        possible_moves = []
+        current_pos = piece.current_position
+        
+        # separate light player and dark player sense of direction
+        direction = 1 if piece.color == Color.WHITE else -1
+        
+        # movement logic
+        new_rank = current_pos.rank + direction
+                
+        try:
+            # validate the movement
+            forward_pos = Position(current_pos.file, new_rank)
+            
+            # check for obstacles
+            if not board.get_piece_at(forward_pos):
+                possible_moves.append(forward_pos)
+            
+            
+            # double moving at the beginning
+            if not piece.has_moved:
+                double_rank = current_pos.rank + (2*direction)
+                double_pos = Position(current_pos.file, double_rank)
+                
+                # check if obstacle
+                if not board. get_piece_at(double_pos):
+                    possible_moves.append(double_pos)
+                    
+        except ValueError:
+            pass
+        
+        # capturing logic
+        for dx in [-1, 1]:
+            try:
+                new_file = chr(ord(current_pos.file) + dx)
+                capture_pos = Position(new_file, new_rank)
+                target = board.get_piece_at(capture_pos)
+                
+                if target and target.color != piece.color:
+                    possible_moves.append(capture_pos)
+            except ValueError:
+                continue
+            
+        return possible_moves
+
 
 
 class KingMovementStrategy(MovementStrategy):
-    def calculate_possible_moves(self, piece, board):
-        pass
-    pass
+    def calculate_possible_moves(self, piece:Piece, board:Board):
+        possible_moves = []
+        current_pos = piece.current_position
+        
+        # all adjacent position 
+        directions = [ (-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1),  (1, 0),  (1, 1) ]
+    
+        for dx, dy in directions:
+            new_file = chr(ord(current_pos.file) + dx)
+            new_rank = current_pos.rank + dy
+            
+            # validate the new position
+            try:
+                new_pos = Position(new_file, new_rank)
+                
+                # incase of any blockers
+                blocking_piece = board.get_piece_at(new_pos)
+                
+                if not blocking_piece or blocking_piece.color != piece.color:
+                    possible_moves.append(new_pos)
+            
+            except ValueError:
+                continue
+            
+        return possible_moves
 
 
-class PawnMovementStrategy(MovementStrategy):
-    def calculate_possible_moves(self, piece, board):
-        pass
-    pass
+
 
 
 class MovementStrategyFactory:
