@@ -1,6 +1,7 @@
 # src/game/chess_game.py
 from typing import Optional, Tuple, List
 from src.board.board import Board
+from src.game.validation import MoveValidator
 from src.pieces.piece import Color, Position, Piece
 from src.pieces.concrete_pieces import King, Pawn
 
@@ -18,6 +19,8 @@ class ChessGame:
         self._current_turn = Color.WHITE
         self._game_state = GameState.ACTIVE
         self._initialize_board()
+        
+        self.validator = MoveValidator(self.board)
 
     def _initialize_board(self):
         """Set up initial piece positions"""
@@ -79,6 +82,10 @@ class ChessGame:
     def move_piece(self, from_pos: Position, to_pos: Position) -> bool:
         if self._game_state != GameState.ACTIVE:
             raise GameOverError("Game has ended")
+        
+        is_valid, error = self.validator.validate_move(from_pos, to_pos)
+        if not is_valid:
+            return False
 
         piece = self.board.get_piece_at(from_pos)
         if not piece or piece.color != self._current_turn:
@@ -102,6 +109,19 @@ class ChessGame:
             if abs(ord(to_pos.file) - ord(from_pos.file)) == 1 and not self.board.get_piece_at(to_pos):
                 captured_pawn_pos = Position(to_pos.file, from_pos.rank)
                 self.board.remove_piece(captured_pawn_pos)
+                
+        # promotion
+        # Handle pawn promotion
+        if isinstance(piece, Pawn):
+            promotion_rank = 8 if piece.color == Color.WHITE else 1
+            if to_pos.rank == promotion_rank:
+                if not promotion_choice:
+                    return False
+                # Create new piece of chosen type
+                promoted_piece = promotion_choice(piece.color, to_pos)
+                self.board.move_piece(from_pos, to_pos)
+                self.board.replace_piece(to_pos, promoted_piece)
+                return True
 
         # Execute move
         self.board.move_piece(from_pos, to_pos)

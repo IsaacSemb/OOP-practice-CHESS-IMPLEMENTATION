@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional, Type
 from src.board.board import Board
+from src.game.moves import PromotionMove
 from src.pieces.piece import Position, Piece, Color
 from src.pieces.concrete_pieces import (
     Rook,
@@ -160,6 +161,7 @@ class PawnMovementStrategy(MovementStrategy):
     def calculate_possible_moves(self, piece:Piece, board:Board):
         possible_moves = []
         current_pos = piece.current_position
+        promotion_rank = 8 if piece.color == Color.WHITE else 1
         
         # separate light player and dark player sense of direction
         direction = 1 if piece.color == Color.WHITE else -1
@@ -199,7 +201,18 @@ class PawnMovementStrategy(MovementStrategy):
                     possible_moves.append(capture_pos)
             except ValueError:
                 continue
-            
+        
+        # Check for promotion possibilities
+        # Get standard pawn moves
+        moves = super().calculate_possible_moves(piece, board)
+        for move in moves:
+            if move.rank == promotion_rank:
+                # Add promotion moves for each possible piece type
+                for promotion_type in [Queen, Rook, Bishop, Knight]:
+                    possible_moves.append(PromotionMove(move, promotion_type))
+            else:
+                possible_moves.append(move)
+                    
         # Add en passant moves
         possible_moves.extend(self._get_en_passant_moves(piece, board))
             
