@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List, Type
+from typing import Dict, List, Optional, Type
 from src.board.board import Board
 from src.pieces.piece import Position, Piece, Color
 from src.pieces.concrete_pieces import (
@@ -200,12 +200,37 @@ class PawnMovementStrategy(MovementStrategy):
             except ValueError:
                 continue
             
+        # Add en passant moves
+        possible_moves.extend(self._get_en_passant_moves(piece, board))
+            
         return possible_moves
+    
+    def _get_en_passant_moves(self, piece: Piece, board: Board) -> List[Position]:
+        if piece.current_position.rank != (5 if piece.color == Color.WHITE else 4):
+            return []
+            
+        en_passant_moves = []
+        for direction in [-1, 1]:
+            try:
+                adjacent_file = chr(ord(piece.current_position.file) + direction)
+                adjacent_pos = Position(adjacent_file, piece.current_position.rank)
+                
+                adjacent_piece = board.get_piece_at(adjacent_pos)
+                if (isinstance(adjacent_piece, Pawn) and 
+                    adjacent_piece.color != piece.color and 
+                    adjacent_piece.just_moved_two):
+                    
+                    capture_rank = piece.current_position.rank + (1 if piece.color == Color.WHITE else -1)
+                    en_passant_moves.append(Position(adjacent_file, capture_rank))
+            except ValueError:
+                continue
+                
+        return en_passant_moves
 
 
 
 class KingMovementStrategy(MovementStrategy):
-    def calculate_possible_moves(self, piece:Piece, board:Board):
+    def calculate_possible_moves(self, piece:King, board:Board):
         possible_moves = []
         current_pos = piece.current_position
         
@@ -228,9 +253,40 @@ class KingMovementStrategy(MovementStrategy):
             
             except ValueError:
                 continue
+        
+        # Add castling moves if conditions are met
+        if not piece.has_moved and not self._is_king_in_check(piece, board):
+            # Kingside castling
+            kingside_rook = self._get_rook_for_castling(piece, board, 'H')
+            if kingside_rook and self._can_castle_kingside(piece, kingside_rook, board):
+                possible_moves.append(Position('G', piece.current_position.rank))
+                
+            # Queenside castling
+            queenside_rook = self._get_rook_for_castling(piece, board, 'A')
+            if queenside_rook and self._can_castle_queenside(piece, queenside_rook, board):
+                possible_moves.append(Position('C', piece.current_position.rank))
+                
             
         return possible_moves
 
+    def _get_rook_for_castling(self, king: Piece, board: Board, file: str) -> Optional[Piece]:
+        rook_pos = Position(file, king.current_position.rank)
+        rook = board.get_piece_at(rook_pos)
+        return rook if isinstance(rook, Rook) and not rook.has_moved else None
+
+    def _can_castle_kingside(self, king: Piece, rook: Piece, board: Board) -> bool:
+        return self._is_path_clear(king, rook, board, ['F', 'G'])
+
+    def _can_castle_queenside(self, king: Piece, rook: Piece, board: Board) -> bool:
+        return self._is_path_clear(king, rook, board, ['B', 'C', 'D'])
+
+    def _is_path_clear(self, king: Piece, rook: Piece, board: Board, files: List[str]) -> bool:
+        rank = king.current_position.rank
+        return all(
+            not board.get_piece_at(Position(file, rank)) and 
+            not self._is_square_attacked(Position(file, rank), board, king.color)
+            for file in files
+        )
 
 
 

@@ -2,7 +2,7 @@
 from typing import Optional, Tuple, List
 from src.board.board import Board
 from src.pieces.piece import Color, Position, Piece
-from src.pieces.concrete_pieces import King
+from src.pieces.concrete_pieces import King, Pawn
 
 
 class GameState:
@@ -56,18 +56,53 @@ class ChessGame:
             self.board.place_piece(Pawn(Color.BLACK,pos),pawn_pos)
 
 
+    # def move_piece(self, from_pos: Position, to_pos: Position) -> bool:
+    #     """Execute a move if valid"""
+    #     if self._game_state != GameState.ACTIVE:
+    #         raise GameOverError("Game has ended")
+    
+    #     piece = self.board.get_piece_at(from_pos)
+    #     if not piece or piece.color != self._current_turn:
+    #         return False
+    
+    #     if to_pos not in piece.get_possible_moves(self.board):
+    #         return False
+    
+    #     # Execute move
+    #     self.board.move_piece(from_pos, to_pos)
+        
+    #     # Update game state
+    #     self._update_game_state()
+    #     self._switch_turn()    
+    #    return True
+    
     def move_piece(self, from_pos: Position, to_pos: Position) -> bool:
-        """Execute a move if valid"""
         if self._game_state != GameState.ACTIVE:
             raise GameOverError("Game has ended")
-    
+
         piece = self.board.get_piece_at(from_pos)
         if not piece or piece.color != self._current_turn:
             return False
-    
+
         if to_pos not in piece.get_possible_moves(self.board):
             return False
-    
+
+        # Handle castling
+        if isinstance(piece, King) and abs(ord(to_pos.file) - ord(from_pos.file)) == 2:
+            rook_file = 'H' if to_pos.file == 'G' else 'A'
+            rook_pos = Position(rook_file, from_pos.rank)
+            new_rook_file = 'F' if to_pos.file == 'G' else 'D'
+            self.board.move_piece(rook_pos, Position(new_rook_file, from_pos.rank))
+        
+        # Handle en passant
+        if isinstance(piece, Pawn):
+            piece.just_moved_two = abs(to_pos.rank - from_pos.rank) == 2
+            
+            # Capture en passant
+            if abs(ord(to_pos.file) - ord(from_pos.file)) == 1 and not self.board.get_piece_at(to_pos):
+                captured_pawn_pos = Position(to_pos.file, from_pos.rank)
+                self.board.remove_piece(captured_pawn_pos)
+
         # Execute move
         self.board.move_piece(from_pos, to_pos)
         

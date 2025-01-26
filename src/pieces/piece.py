@@ -55,6 +55,7 @@ class Piece(ABC):
         self._color = color
         self._current_position = initial_position
         self._has_moved = False
+        self.just_moved_two = False  # For en passant tracking
         
     @property
     def color(self) -> Color:
