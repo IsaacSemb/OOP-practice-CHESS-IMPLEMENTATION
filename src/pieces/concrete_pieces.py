@@ -19,7 +19,7 @@ class Rook(Piece):
 class Knight(Piece):
     def __init__(self, color:Color, position:Position):
         super().__init__(color, position)
-        self.movement_strategy = MovementStrategyFactory.get_movement_strategy(Rook)
+        self.movement_strategy = MovementStrategyFactory.get_movement_strategy(Knight)
 
     def get_possible_moves(self, board):
         return self.movement_strategy.calculate_possible_moves(self, board)
@@ -33,7 +33,7 @@ class Knight(Piece):
 class Bishop(Piece):
     def __init__(self, color:Color, position:Position):
         super().__init__(color, position)
-        self.movement_strategy = MovementStrategyFactory.get_movement_strategy(Rook)
+        self.movement_strategy = MovementStrategyFactory.get_movement_strategy(Bishop)
 
     def get_possible_moves(self, board):
         return self.movement_strategy.calculate_possible_moves(self, board)
@@ -47,7 +47,7 @@ class Bishop(Piece):
 class Queen(Piece):
     def __init__(self, color:Color, position:Position):
         super().__init__(color, position)
-        self.movement_strategy = MovementStrategyFactory.get_movement_strategy(Rook)
+        self.movement_strategy = MovementStrategyFactory.get_movement_strategy(Queen)
 
     def get_possible_moves(self, board):
         return self.movement_strategy.calculate_possible_moves(self, board)
@@ -61,7 +61,7 @@ class Queen(Piece):
 class King(Piece):
     def __init__(self, color:Color, position:Position):
         super().__init__(color, position)
-        self.movement_strategy = MovementStrategyFactory.get_movement_strategy(Rook)
+        self.movement_strategy = MovementStrategyFactory.get_movement_strategy(King)
 
     def get_possible_moves(self, board):
         return self.movement_strategy.calculate_possible_moves(self, board)
@@ -75,7 +75,7 @@ class King(Piece):
 class Pawn(Piece):
     def __init__(self, color:Color, position:Position):
         super().__init__(color, position)
-        self.movement_strategy = MovementStrategyFactory.get_movement_strategy(Rook)
+        self.movement_strategy = MovementStrategyFactory.get_movement_strategy(Pawn)
 
     def get_possible_moves(self, board):
         return self.movement_strategy.calculate_possible_moves(self, board)
@@ -83,5 +83,3 @@ class Pawn(Piece):
     @property
     def piece_type(self) -> PieceType:
         return PieceType.PAWN
-
-

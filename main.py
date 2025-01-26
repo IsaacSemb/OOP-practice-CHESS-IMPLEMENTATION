@@ -1,7 +1,6 @@
 from src.game.chess_game import ChessGame
 from src.pieces.piece import Color, Position
 
-
 class ChessGameCLI:
     def __init__(self):
         self.game = ChessGame()

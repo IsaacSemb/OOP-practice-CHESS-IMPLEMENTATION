@@ -1,10 +1,7 @@
-# src/game/chess_game.py
 from typing import Optional, Tuple, List
 from src.board.board import Board
 from src.game.validation import MoveValidator
 from src.pieces.piece import Color, Position, Piece
-from src.pieces.concrete_pieces import King, Pawn
-
 
 class GameState:
     ACTIVE = "ACTIVE"
@@ -193,7 +190,7 @@ class ChessGame:
         
 
     
-    def _is_king_in_check(self, king:King):
+    def _is_king_in_check(self, king):
         """
         check for if current player king is in check or not 
         

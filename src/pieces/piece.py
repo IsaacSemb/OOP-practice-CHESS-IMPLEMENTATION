@@ -5,6 +5,8 @@ class Color(Enum):
     WHITE = auto()
     BLACK = auto()
 
+
+
 class PieceType(Enum):
     PAWN = auto()
     ROOK = auto()
