@@ -3,14 +3,7 @@ from typing import Dict, List, Optional, Type
 from src.board.board import Board
 from src.game.moves import PromotionMove
 from src.pieces.piece import Position, Piece, Color
-from src.pieces.concrete_pieces import (
-    Rook,
-    Knight,
-    Bishop,
-    Queen,
-    King,
-    Pawn 
-    )
+
 
 class MovementStrategy(ABC):
     
@@ -159,6 +152,9 @@ class QueenMovementStrategy(MovementStrategy):
 
 class PawnMovementStrategy(MovementStrategy):
     def calculate_possible_moves(self, piece:Piece, board:Board):
+        
+        from src.pieces.concrete_pieces import ( Rook, Knight, Queen, Bishop )
+        
         possible_moves = []
         current_pos = piece.current_position
         promotion_rank = 8 if piece.color == Color.WHITE else 1
@@ -201,11 +197,8 @@ class PawnMovementStrategy(MovementStrategy):
                     possible_moves.append(capture_pos)
             except ValueError:
                 continue
-        
-        # Check for promotion possibilities
-        # Get standard pawn moves
-        moves = super().calculate_possible_moves(piece, board)
-        for move in moves:
+            
+        for move in possible_moves:
             if move.rank == promotion_rank:
                 # Add promotion moves for each possible piece type
                 for promotion_type in [Queen, Rook, Bishop, Knight]:
@@ -229,7 +222,7 @@ class PawnMovementStrategy(MovementStrategy):
                 adjacent_pos = Position(adjacent_file, piece.current_position.rank)
                 
                 adjacent_piece = board.get_piece_at(adjacent_pos)
-                if (isinstance(adjacent_piece, Pawn) and 
+                if (isinstance(adjacent_piece) and 
                     adjacent_piece.color != piece.color and 
                     adjacent_piece.just_moved_two):
                     
@@ -243,7 +236,7 @@ class PawnMovementStrategy(MovementStrategy):
 
 
 class KingMovementStrategy(MovementStrategy):
-    def calculate_possible_moves(self, piece:King, board:Board):
+    def calculate_possible_moves(self, piece, board:Board):
         possible_moves = []
         current_pos = piece.current_position
         
@@ -285,7 +278,7 @@ class KingMovementStrategy(MovementStrategy):
     def _get_rook_for_castling(self, king: Piece, board: Board, file: str) -> Optional[Piece]:
         rook_pos = Position(file, king.current_position.rank)
         rook = board.get_piece_at(rook_pos)
-        return rook if isinstance(rook, Rook) and not rook.has_moved else None
+        return rook if isinstance(rook) and not rook.has_moved else None
 
     def _can_castle_kingside(self, king: Piece, rook: Piece, board: Board) -> bool:
         return self._is_path_clear(king, rook, board, ['F', 'G'])
@@ -312,6 +305,8 @@ class MovementStrategyFactory:
     - Factory Method
     - Strategy Pattern
     """
+    from src.pieces.concrete_pieces import ( Rook, Knight, Bishop, Queen, King, Pawn )
+    
     _strategies: Dict[Type[Piece], Type[MovementStrategy]] = {
         Rook: RookMovementStrategy,
         Knight: KnightMovementStrategy,

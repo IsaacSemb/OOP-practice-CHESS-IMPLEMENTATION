@@ -49,6 +49,8 @@ class Board:
         
         if self._board_state[position] is not None:
             raise ValueError(f"Position {position} is already occupied")
+        
+        self._board_state[position] = piece
     
     def move_piece (self, from_position:Position, to_position:Position):
         """

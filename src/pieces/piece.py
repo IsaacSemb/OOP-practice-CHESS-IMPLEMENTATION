@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from enum import Enum, auto
 
+
 class Color(Enum):
     WHITE = auto()
     BLACK = auto()
-
 
 
 class PieceType(Enum):
@@ -14,7 +14,8 @@ class PieceType(Enum):
     BISHOP = auto()
     QUEEN = auto()
     KING = auto()
-    
+
+
 class Position:
     def __init__(self, file:str, rank:int):
         """
@@ -29,13 +30,13 @@ class Position:
         if not ( 1<=rank<=8 and file.upper() in 'ABCDEFGH' ):
             raise ValueError(f"Invalid chess position {file}{rank}")
         
-        # if the file and rank are valid the e assign them
+        # if the file and rank are valid then assign them
         self.file = file.upper()
         self.rank = rank
     
     def __str__(self):
         """
-        
+        a string representation of the class instance
         """
         return f"{self.file}{self.rank}"
     
@@ -43,12 +44,13 @@ class Position:
         """
         
         """
-        return f"Position({self.file},{self.rank})"
-    
+        return f"Position({self.file}, {self.rank})"
+
+
 class Piece(ABC):
     def __init__(self, color:Color, initial_position:Position):
         """
-        Base Class fro all the chess pieces
+        Base Class for all the chess pieces
         
         Args:
             color (Color): Piece color
