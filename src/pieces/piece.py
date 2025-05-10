@@ -3,17 +3,33 @@ from enum import Enum, auto
 
 
 class Color(Enum):
-    WHITE = auto()
-    BLACK = auto()
+    """
+    Enumeration of the piece colors  
+    In chess, pieces are either `black` or `white`, 
+    this enum is used to represent the two colors.  
+    """
+    WHITE = "WHITE"
+    BLACK = "BLACK"
 
 
 class PieceType(Enum):
-    PAWN = auto()
-    ROOK = auto()
-    KNIGHT = auto()
-    BISHOP = auto()
-    QUEEN = auto()
-    KING = auto()
+    """
+    Enumeration of the piece types
+    We have 6 types of pieces in chess:
+    - Pawn
+    - Rook
+    - Knight
+    - Bishop
+    - Queen
+    - King  
+    Each piece type is represented as an enum member  
+    """
+    PAWN = "PAWN"
+    ROOK = "ROOK"
+    KNIGHT = "KNIGHT"
+    BISHOP = "BISHOP"
+    QUEEN = "QUEEN"
+    KING = "KING"
 
 
 class Position:
@@ -42,7 +58,11 @@ class Position:
     
     def __repr__(self):
         """
-        
+        Returns a string representation of the piece's position.
+        The string is formatted as 'Position(file, rank)', where `file` and `rank`
+        represent the piece's current position on the chessboard.
+        Returns:
+            str: A string representation of the piece's position.
         """
         return f"Position({self.file}, {self.rank})"
 
