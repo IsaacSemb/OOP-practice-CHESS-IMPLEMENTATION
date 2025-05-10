@@ -1,16 +1,43 @@
 import sys
 import os
+
 # Add the root directory to sys.path
 root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 sys.path.append(root_path) 
 
 
 import pytest
-from src.pieces.piece import Position
+from src.pieces.piece import Color, PieceType, Position
 
 
 
-# testing the position class
+def test_color_enum():
+    """
+    Test the Color enum values.
+    """
+    assert Color.BLACK.value == "BLACK"
+    assert Color.WHITE.value == "WHITE"
+
+    
+def test_color_enum_names():
+    """
+    Test the Color enum names.
+    """
+    assert Color.WHITE.name == "WHITE"
+    assert Color.BLACK.name == "BLACK"
+
+def test_piece_names():
+    """
+    validate the names types of pieces
+    """
+    assert PieceType.KING.name == "KING"
+    assert PieceType.QUEEN.name == "QUEEN"
+    assert PieceType.KNIGHT.name == "KNIGHT"
+    assert PieceType.BISHOP.name == "BISHOP"
+    assert PieceType.ROOK.name == "ROOK"
+    assert PieceType.PAWN.name == "PAWN"
+
+
 
 def test_valid_position():
     position = Position("A", 1)
